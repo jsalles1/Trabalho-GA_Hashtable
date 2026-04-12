@@ -2,6 +2,7 @@
 #include <list>
 #include <stdlib.h>
 #include <vector>
+#include "Sensor.cpp"
 
 using namespace std;
 
@@ -10,7 +11,7 @@ private:
     int buckets;
 
     //vetor contendo listas
-    vector<list<int>> table;
+    vector<list<Sensor>> table;
 
 public:
     //construtor: recebe a qntd de buckets e define o tamanho do vetor
@@ -19,20 +20,24 @@ public:
         table.resize(buckets);
     }
 
-    //insercao
-    void insert(int n){
-        //funcao simples TO DO: criar funcao melhor!!
-        int bucket = n % buckets;
+    //funcao simples TO DO: criar funcao melhor!!
+    int hashFunction(int id, int buckets) {
+        return id % buckets;
+    }
 
-        table[bucket].push_back(n);
+    //insercao
+    void insert(Sensor s){
+        int bucket =  hashFunction(s.getId(), buckets);
+
+        table[bucket].push_back(s);
     };
 
     //print
     void print(){
         for(int i = 0; i < buckets; i++){
             cout << "| Bucket " << i << " | ";
-            for(auto j : table[i]){
-                cout << "-> | " << j << " | ";
+            for(auto &s : table[i]){
+                s.print();
             }
         cout << endl;
         }
@@ -40,55 +45,41 @@ public:
     };
 
     //procura valor especifico e retorno o bucket q ele esta
-    void search(int n){
-        int bucket = n % buckets;
+    Sensor* search(int id){
+        int bucket = hashFunction(id, buckets);
 
-        for(auto i : table[bucket]){
-            if(i == n){
+        for(auto &s : table[bucket]){
+            if(s.getId() == id){
                 cout << "Bucket: " << bucket << endl;
+                return &s;
+            }
+        }
+        return nullptr;
+    };
+
+    //remover valor especifico
+    void remove(int id){
+        int bucket = hashFunction(id, buckets);
+
+        //para fazer erase() eh necessario usar iterador (auto i : table[bucket] nao funciona)
+        for(auto i = table[bucket].begin(); i != table[bucket].end(); i++){
+            if(i->getId() == id){
+                table[bucket].erase(i);
+                cout << "Sensor removido" << endl;
                 return;
             }
         }
         cout << "Não encontrado" << endl;
     };
 
-    //remover valor especifico
-    void remove(int n){
-        int bucket = n % buckets;
-
-        //para fazer erase() eh necessario usar iterador (auto i : table[bucket] nao funciona)
-        for(auto i = table[bucket].begin(); i != table[bucket].end(); i++){
-            if(*i == n){
-                table[bucket].erase(i);
-                cout << "Valor: " << n <<" removido do Bucket: " << bucket << endl;
-                return;
+    void atualizarLeitura(int id, double valor) {
+        Sensor* s = search(id);
+        if (s != nullptr) {
+            s->atualizarLeitura(valor);
+            cout << "Leitura atualizada!\n";
+        } else {
+            cout << "Sensor nao encontrado!\n";
             }
-        }
-        cout << "Não encontrado" << endl; 
-    };
-};
-
-//testes
-int main(){
-    //cria hash com 8 buckets
-    HashTable hash(8);
-
-    //inserindo 20 numeros aleatorios
-    for(int i = 0; i < 20; i++){
-        hash.insert(rand() % 100);
     }
-    hash.print();
 
-    //teste insere
-    hash.insert(10);
-    hash.print();
-
-    //teste busca
-    hash.search(10);
-
-    //teste remove
-    hash.remove(10);
-    hash.print();
-
-    return 0;
-}
+};

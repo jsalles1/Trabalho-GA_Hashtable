@@ -15,7 +15,7 @@ public:
         this->id = id;
         this->tipo = tipo;
         this->localizacao = localizacao;
-        this->ultimaLeitura = 0;
+        this->ultimaLeitura = ultimaLeitura;
     }
 
     //getters
