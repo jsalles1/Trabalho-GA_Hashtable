@@ -9,6 +9,7 @@ using namespace std;
 class HashTable{
 private:
     int buckets;
+    int totalColisoes;
 
     //vetor contendo listas
     vector<list<Sensor>> table;
@@ -17,6 +18,7 @@ public:
     //construtor: recebe a qntd de buckets e define o tamanho do vetor
     HashTable(int buckets){
         this->buckets = buckets;
+        totalColisoes = 0;
         table.resize(buckets);
     }
 
@@ -28,6 +30,10 @@ public:
     //insercao
     void insert(Sensor s){
         int bucket =  hashFunction(s.getId(), buckets);
+
+        if(!table[bucket].empty()){
+            totalColisoes++;
+        }
 
         table[bucket].push_back(s);
     };
@@ -45,12 +51,14 @@ public:
     };
 
     //procura valor especifico e retorno o bucket q ele esta
-    Sensor* search(int id){
+    Sensor* search(int id, bool exibirBucket = true){
         int bucket = hashFunction(id, buckets);
 
         for(auto &s : table[bucket]){
             if(s.getId() == id){
-                cout << "Bucket: " << bucket << endl;
+                if(exibirBucket){
+                    cout << "Bucket: " << bucket << endl;
+                }
                 return &s;
             }
         }
@@ -80,6 +88,14 @@ public:
         } else {
             cout << "Sensor nao encontrado!\n";
             }
+    }
+
+    int getTotalColisoes(){
+        return totalColisoes;
+    }
+
+    int getCapacidade(){
+        return buckets;
     }
 
 };
