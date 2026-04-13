@@ -135,9 +135,7 @@ int main(){
             executarTesteDesempenho();
         }
 
-    }while(opcao != 0);
-
-    cout << "Encerrando sistema...\n";
+    }while(opcao != 0);;
 
     return 0;
 }
